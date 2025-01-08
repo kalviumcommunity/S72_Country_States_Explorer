@@ -1,0 +1,33 @@
+Project Title:
+Country States Explorer
+
+Project Overview:
+Country States Explorer is a simple application that allows users to input a country’s name and retrieve a list of states (or administrative divisions) within that country. The purpose is to provide an intuitive and lightweight tool for exploring geographical information quickly.
+
+Key Features:
+Input a country’s name to fetch its states or administrative divisions.
+Display the results in a clean, user-friendly format.
+Error handling for invalid or unsupported country names.
+Responsive design for use on both desktop and mobile devices.
+Tech Stack:
+Frontend:
+
+Framework: React.js (chosen for its component-based architecture and ease of managing state, ensuring a smooth user experience)
+Backend:
+
+Language: Python
+Framework: FastAPI (preferred for its asynchronous capabilities, which improve API performance and scalability. Additionally, its modern design simplifies development and includes built-in support for documentation using OpenAPI standards.)
+API Integration:
+
+REST Countries API or a similar service
+Others:
+
+Data Storage: None (data fetched via APIs at runtime)
+Deployment: Vercel for frontend, Render for backend
+Why This Project:
+This project is simple yet practical, providing a chance to explore web development and API integration. It’s interesting because it combines frontend and backend development with real-world data. By working on this project, you’ll develop skills in:
+
+Using Python for backend development with FastAPI.
+Fetching and handling data from APIs.
+Building a responsive user interface with React.js.
+Debugging and error handling in web applications.
