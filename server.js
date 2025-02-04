@@ -1,34 +1,26 @@
-const express = require('express');
+require("dotenv").config();
+const express = require("express");
+const mongoose = require("mongoose");
+
 const app = express();
-const port = 3000;
+const PORT = process.env.PORT || 5000;
 
-// Basic /ping route with error handling
-app.get('/ping', (req, res, next) => {
-  try {
-    res.send('Pong');
-  } catch (error) {
-    next(error); // Pass the error to the error-handling middleware
-  }
+// MongoDB Connection
+mongoose
+  .connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.error("MongoDB connection error:", err));
+
+// Check Database Connection Status
+app.get("/", (req, res) => {
+  const dbStatus = mongoose.connection.readyState === 1 ? "Connected" : "Disconnected";
+  res.json({ database: dbStatus });
 });
 
-// Catch-all error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack); // Log the error stack for debugging
-  res.status(500).json({
-    error: 'Something went wrong!',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'Internal Server Error',
-  });
+// Start Server
+app.listen(PORT, () => {
+  console.log(`Server is running on port http://localhost:${PORT}`);
 });
-
-// Catch-all route for undefined routes
-app.use((req, res) => {
-  res.status(404).json({
-    error: 'Not Found',
-    message: `The resource at ${req.originalUrl} was not found on this server.`,
-  });
-});
-
-// Start the server
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-}); 
