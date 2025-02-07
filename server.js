@@ -1,10 +1,15 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
+const cityRoutes = require('./routes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+
+app.use(express.json());
+
+app.use('/', cityRoutes);
 // MongoDB Connection
 mongoose
   .connect(process.env.MONGODB_URI, {
@@ -13,6 +18,8 @@ mongoose
   })
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
+
+
 
 // Check Database Connection Status
 app.get("/", (req, res) => {
