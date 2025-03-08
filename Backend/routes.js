@@ -1,79 +1,68 @@
-const express = require('express');
+const express = require("express");
+const City = require("./models/City"); // Import schema
 const router = express.Router();
 
-// In-memory array to store city data
-let cities = [];
-
 // CREATE - Add a new city
-router.post('/cities', (req, res) => {
+router.post("/cities", async (req, res) => {
+  try {
     const { name, population, description, is_capital } = req.body;
-
     if (!name || !population) {
-        return res.status(400).send('Name and population are required.');
+      return res.status(400).json({ error: "Name and population are required." });
     }
 
-    const newCity = {
-        id: cities.length + 1,  // Simple ID generation
-        name,
-        population,
-        description: description || '',
-        is_capital: is_capital !== undefined ? is_capital : true
-    };
-
-    cities.push(newCity);
+    const newCity = new City({ name, population, description, is_capital });
+    await newCity.save();
+    
     res.status(201).json(newCity);
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 // READ - Get all cities
-router.get('/cities', (req, res) => {
+router.get("/cities", async (req, res) => {
+  try {
+    const cities = await City.find();
     res.status(200).json(cities);
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 // READ - Get a single city by ID
-router.get('/cities/:id', (req, res) => {
-    const cityId = parseInt(req.params.id);
-    const city = cities.find(c => c.id === cityId);
-
-    if (!city) {
-        return res.status(404).send('City not found.');
-    }
+router.get("/cities/:id", async (req, res) => {
+  try {
+    const city = await City.findById(req.params.id);
+    if (!city) return res.status(404).json({ error: "City not found" });
 
     res.status(200).json(city);
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 // UPDATE - Update a city by ID
-router.put('/cities/:id', (req, res) => {
-    const cityId = parseInt(req.params.id);
-    const cityIndex = cities.findIndex(c => c.id === cityId);
+router.put("/cities/:id", async (req, res) => {
+  try {
+    const updatedCity = await City.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updatedCity) return res.status(404).json({ error: "City not found" });
 
-    if (cityIndex === -1) {
-        return res.status(404).send('City not found.');
-    }
-
-    const { name, population, description, is_capital } = req.body;
-    const updatedCity = {
-        ...cities[cityIndex],
-        name: name || cities[cityIndex].name,
-        population: population || cities[cityIndex].population,
-        description: description || cities[cityIndex].description,
-        is_capital: is_capital !== undefined ? is_capital : cities[cityIndex].is_capital
-    };
-
-    cities[cityIndex] = updatedCity;
     res.status(200).json(updatedCity);
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 // DELETE - Remove a city by ID
-router.delete('/cities/:id', (req, res) => {
-    const cityId = parseInt(req.params.id);
-    const cityIndex = cities.findIndex(c => c.id === cityId);
+router.delete("/cities/:id", async (req, res) => {
+  try {
+    const deletedCity = await City.findByIdAndDelete(req.params.id);
+    if (!deletedCity) return res.status(404).json({ error: "City not found" });
 
-    if (cityIndex === -1) {
-        return res.status(404).send('City not found.');
-    }
-
-    const deletedCity = cities.splice(cityIndex, 1);
-    res.status(200).json({ message: 'City deleted successfully.', city: deletedCity[0] });
+    res.status(200).json({ message: "City deleted successfully.", city: deletedCity });
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 module.exports = router;
