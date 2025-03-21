@@ -4,7 +4,7 @@ const citySchema = new mongoose.Schema({
   name: { type: String, required: true },
   population: { type: Number, required: true },
   description: { type: String, default: "" },
-  is_capital: { type: Boolean, default: false },
+  capital: { type: Boolean, default: false },
 });
 
 const City = mongoose.model("City", citySchema);

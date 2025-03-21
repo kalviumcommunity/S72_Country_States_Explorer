@@ -12,6 +12,9 @@ const LandingPage = () => {
       <Link to="/cities">
         <button style={styles.button}>Explore Cities</button>
       </Link>
+      <Link to="/mongo-cities" style={{ color: "white", margin: "10px" }}>
+      View MongoDB Cities
+    </Link>
     </div>
   );
 };

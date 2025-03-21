@@ -7,7 +7,7 @@ const cityRoutes = require("./routes");
 const app = express();
 app.use(express.json());
 app.use(cors()); 
-const PORT = process.env.PORT || 6000;
+const PORT = process.env.PORT || 3000;
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
