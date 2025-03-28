@@ -3,7 +3,7 @@ import StateCard from "./Components/StateCard";
 
 const cardEntity = () => {
   return (
-    <div style={{ backgroundColor: "black", padding: "20px" }}>
+    <div style={{ backgroundColor: "#231650", padding: "20px" }}>
       <StateCard 
         name="California"
         country="USA"

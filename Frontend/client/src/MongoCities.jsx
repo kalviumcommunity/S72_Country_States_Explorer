@@ -22,13 +22,14 @@ const MongoCities = () => {
 
 
   return (
-    <div style={{ backgroundColor: "black", padding: "20px" }}>
+    <div style={{ backgroundColor: "#231650", padding: "20px" }}>
       <h1 style={{ color: "white", textAlign: "center" }}>MongoDB Cities</h1>
       {loading ? (
         <p style={{ color: "white" }}>Loading cities...</p>
       ) : cities.length > 0 ? (
         cities.map((city, index) => (
           <StateCard 
+            country={city.country}
             key={index}
             name={city.name}
             population={city.population}
