@@ -112,7 +112,7 @@ const styles = {
     alignItems: "center",
   },
   formContainer: {
-    backgroundColor: "#FC6C85", // Dark gray form background
+    backgroundColor: "#222", // Dark gray form background
     padding: "30px",
     borderRadius: "10px",
     width: "320px",
@@ -134,12 +134,9 @@ const styles = {
     marginBottom: "10px",
     borderRadius: "5px",
     border: "none",
-    backgroundColor: "white",
+    backgroundColor: "#333",
     color: "#fff",
     outline: "none",
-    "::placeholder": {
-      color: "black",
-    }
   },
   checkboxLabel: {
     display: "flex",

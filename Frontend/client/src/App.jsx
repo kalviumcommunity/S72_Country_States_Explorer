@@ -4,6 +4,7 @@ import LandingPage from "./LandingPage";
 import CardEntity from "./cardEntity"; // ✅ Use PascalCase
 import MongoCities from "./MongoCities";
 import AddStateForm from "./AddStateForm";
+import UpdateCityForm from "./Components/UpdateCityForm";
 
 
 function App() {
@@ -14,7 +15,7 @@ function App() {
         <Route path="/cities" element={<CardEntity />} />  
         <Route path="/mongo-cities" element={<MongoCities />}/>
         <Route path="/add-state" element={<AddStateForm />} />
-
+        <Route path="/cities/update/:id" element={<UpdateCityForm />} />
       </Routes>
     </BrowserRouter>
   );
