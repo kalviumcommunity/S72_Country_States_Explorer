@@ -15,6 +15,9 @@ const LandingPage = () => {
       <Link to="/mongo-cities" style={{ color: "white", margin: "10px" }}>
       View MongoDB Cities
     </Link>
+    <Link to="/add-state">
+        <button>Add a State</button>
+      </Link>
     </div>
   );
 };
