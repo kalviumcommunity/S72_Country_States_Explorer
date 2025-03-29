@@ -9,7 +9,7 @@ const router = express.Router();
 router.post(
   "/cities",
   [
-    body("name").notEmpty().withMessage("City name is required"),
+    body("name").notEmpty().withMessage("State name is required"),
     body("country").notEmpty().withMessage("Country name is required"),
     body("population").isInt({ min: 1 }).withMessage("Population must be a positive integer"),
     body("description").optional().isString(),
@@ -67,16 +67,33 @@ router.get("/cities/:id", async (req, res) => {
 
 // UPDATE - Update a city by ID
 router.put("/cities/:id", async (req, res) => {
-  try {
-    if (!ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ error: "Invalid city ID format" });
-    }
+  const { id } = req.params;
+  const { name, country, population, description, isCapital } = req.body;
 
-    const updatedCity = await City.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updatedCity) return res.status(404).json({ error: "City not found" });
+  // Validate ObjectId
+  if (!ObjectId.isValid(id)) {
+    return res.status(400).json({ error: "Invalid city ID format" });
+  }
+
+  // Validate required fields
+  if (!name || !country || population == null || !description || isCapital == null) {
+    return res.status(400).json({ error: "All fields (name, country, population, description, isCapital) are required" });
+  }
+
+  try {
+    const updatedCity = await City.findByIdAndUpdate(
+      id,
+      { name, country, population, description, isCapital },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedCity) {
+      return res.status(404).json({ error: "City not found" });
+    }
 
     res.status(200).json(updatedCity);
   } catch (error) {
+    console.error("Error updating city:", error);
     res.status(500).json({ error: "Server error" });
   }
 });
