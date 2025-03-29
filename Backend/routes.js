@@ -1,26 +1,43 @@
 const express = require("express");
+const { body, validationResult } = require("express-validator");
 const City = require("./models/City"); // Import schema
-const router = express.Router();
 const { ObjectId } = require("mongodb");
 
-// CREATE - Add a new city
-router.post('/cities', async (req, res) => {
-  try {
-      const newCity = new City(req.body); // Create a new city
-      await newCity.save(); // Save to MongoDB
+const router = express.Router();
+
+// CREATE - Add a new city with validation
+router.post(
+  "/cities",
+  [
+    body("name").notEmpty().withMessage("City name is required"),
+    body("country").notEmpty().withMessage("Country name is required"),
+    body("population").isInt({ min: 1 }).withMessage("Population must be a positive integer"),
+    body("description").optional().isString(),
+    body("capital").isBoolean().withMessage("Capital must be a boolean"),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+      const newCity = new City(req.body);
+      await newCity.save();
       res.status(201).json(newCity);
-  } catch (error) {
+    } catch (error) {
       res.status(500).json({ error: "Failed to add city" });
+    }
   }
-});
+);
 
 // READ - Get all cities
 router.get('/cities', async (req, res) => {
   try {
-      const cities = await City.find(); // Fetch data from MongoDB
-      res.json(cities);
+    const cities = await City.find(); // Fetch data from MongoDB
+    res.json(cities);
   } catch (error) {
-      res.status(500).json({ error: "Failed to fetch cities" });
+    res.status(500).json({ error: "Failed to fetch cities" });
   }
 });
 
@@ -29,26 +46,32 @@ router.get("/cities/:id", async (req, res) => {
   console.log("Received request for city ID:", req.params.id);
 
   try {
-      const city = await City.findOne({ _id: new ObjectId(req.params.id) });
+    if (!ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ error: "Invalid city ID format" });
+    }
 
-      if (!city) {
-          console.log("City not found in DB");
-          return res.status(404).json({ error: "City not found" });
-      }
+    const city = await City.findOne({ _id: new ObjectId(req.params.id) });
 
-      console.log("City found:", city);
-      res.json(city);
+    if (!city) {
+      console.log("City not found in DB");
+      return res.status(404).json({ error: "City not found" });
+    }
+
+    console.log("City found:", city);
+    res.json(city);
   } catch (err) {
-      console.error("Error fetching city:", err);
-      res.status(400).json({ error: "Invalid ID format" });
+    console.error("Error fetching city:", err);
+    res.status(500).json({ error: "Server error" });
   }
 });
-
-
 
 // UPDATE - Update a city by ID
 router.put("/cities/:id", async (req, res) => {
   try {
+    if (!ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ error: "Invalid city ID format" });
+    }
+
     const updatedCity = await City.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!updatedCity) return res.status(404).json({ error: "City not found" });
 
@@ -61,6 +84,10 @@ router.put("/cities/:id", async (req, res) => {
 // DELETE - Remove a city by ID
 router.delete("/cities/:id", async (req, res) => {
   try {
+    if (!ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ error: "Invalid city ID format" });
+    }
+
     const deletedCity = await City.findByIdAndDelete(req.params.id);
     if (!deletedCity) return res.status(404).json({ error: "City not found" });
 
