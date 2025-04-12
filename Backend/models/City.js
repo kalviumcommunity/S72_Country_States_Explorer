@@ -6,6 +6,11 @@ const citySchema = new mongoose.Schema({
   population: { type: Number, required: true },
   description: { type: String, default: "" },
   capital: { type: Boolean, default: false },
+  created_by: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User", // Assuming you have a User model
+    required: true
+  }
 });
 
 const City = mongoose.model("City", citySchema);
