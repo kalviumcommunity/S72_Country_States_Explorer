@@ -1,11 +1,64 @@
 const express = require("express");
 const { body, validationResult } = require("express-validator");
 const City = require("./models/City"); // Import schema
+const User = require('./models/User');
 const { ObjectId } = require("mongodb");
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const router = express.Router();
 
-// CREATE - Add a new city with validation
+router.post('/register', async (req, res) => {
+  try {
+      const { username, password } = req.body;
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+      const newUser = new User({ username, password: hashedPassword });
+      await newUser.save();
+      res.status(201).json({ message: 'User registered successfully' });
+  } catch (error) {
+      res.status(500).json({ error: 'Error registering user' });
+  }
+});
+
+router.post('/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const user = await User.findOne({ username });
+
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(401).json({ error: 'Invalid credentials' });
+
+    // Create JWT token
+    const token = jwt.sign(
+      { id: user._id, username: user.username },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
+    );
+
+    // Set cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      sameSite: 'strict',          // Adjust if using cross-site cookies
+      secure: process.env.NODE_ENV === 'production' // Use only in production over HTTPS
+    });
+
+    res.status(200).json({ message: 'Login successful' });
+  } catch (error) {
+    res.status(500).json({ error: 'Error logging in' });
+  }
+});
+
+router.post('/logout', (req, res) => {
+  res.clearCookie('token');
+  res.status(200).json({ message: 'Logged out successfully' });
+});
+
+
 router.post(
   "/cities",
   [
@@ -14,6 +67,7 @@ router.post(
     body("population").isInt({ min: 1 }).withMessage("Population must be a positive integer"),
     body("description").optional().isString(),
     body("capital").isBoolean().withMessage("Capital must be a boolean"),
+    body("created_by").notEmpty().withMessage("Created by is required"),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -22,7 +76,7 @@ router.post(
     }
 
     try {
-      const newCity = new City(req.body);
+      const newCity = new City(req.body); // req.body now must include `created_by`
       await newCity.save();
       res.status(201).json(newCity);
     } catch (error) {
@@ -30,6 +84,7 @@ router.post(
     }
   }
 );
+
 
 // READ - Get all cities
 router.get('/cities', async (req, res) => {
