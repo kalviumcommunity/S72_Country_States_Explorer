@@ -1,7 +1,7 @@
 const express = require("express");
 const { body, validationResult } = require("express-validator");
-const City = require("./models/City"); // Import schema
-const User = require('./models/User');
+const City = require("../models/City"); // Import schema
+const User = require('../models/User');
 const { ObjectId } = require("mongodb");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
