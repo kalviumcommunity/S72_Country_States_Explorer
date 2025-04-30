@@ -169,4 +169,14 @@ router.delete("/cities/:id", async (req, res) => {
   }
 });
 
+// GET - Get all users
+router.get('/users', async (req, res) => {
+  try {
+    const users = await User.find().select('username _id'); // Only fetch username and _id
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch users" });
+  }
+});
+
 module.exports = router;

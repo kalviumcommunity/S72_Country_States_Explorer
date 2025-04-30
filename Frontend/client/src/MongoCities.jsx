@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 
 const MongoCities = () => {
   const [cities, setCities] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState("");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -21,8 +23,21 @@ const MongoCities = () => {
       });
   };
 
+  const fetchUsers = () => {
+    fetch("http://localhost:3000/users")
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Fetched Users:", data);
+        setUsers(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching users:", error);
+      });
+  };
+
   useEffect(() => {
     fetchCities();
+    fetchUsers();
   }, []);
 
   const handleDelete = async (id) => {
@@ -47,15 +62,44 @@ const MongoCities = () => {
     navigate(`/cities/update/${id}`);
   };
 
+  const handleUserChange = (e) => {
+    setSelectedUser(e.target.value);
+  };
+
+  const filteredCities = selectedUser
+    ? cities.filter((city) => city.created_by === selectedUser)
+    : cities;
+
   return (
     <div style={{ backgroundColor: "#231650", padding: "20px", minHeight: "100vh" }}>
       <h1 style={{ color: "white", textAlign: "center" }}>MongoDB Cities</h1>
       
+      <div style={{ marginBottom: "20px", textAlign: "center" }}>
+        <select
+          value={selectedUser}
+          onChange={handleUserChange}
+          style={{
+            padding: "8px",
+            borderRadius: "4px",
+            backgroundColor: "white",
+            border: "1px solid #ccc",
+            minWidth: "200px"
+          }}
+        >
+          <option value="">All Users</option>
+          {users.map((user) => (
+            <option key={user._id} value={user._id}>
+              {user.username}
+            </option>
+          ))}
+        </select>
+      </div>
+      
       {loading ? (
         <p style={{ color: "white", textAlign: "center" }}>Loading cities...</p>
-      ) : cities.length > 0 ? (
+      ) : filteredCities.length > 0 ? (
         <div style={styles.gridContainer}>
-          {cities.map((city) => (
+          {filteredCities.map((city) => (
             <div key={city._id} style={styles.cardContainer}>
               <StateCard 
                 country={city.country}
