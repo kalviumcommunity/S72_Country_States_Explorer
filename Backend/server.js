@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const cityRoutes = require("./routes/routes");
 const cookieParser = require('cookie-parser');
-const authRoutes = require('./routes/auth.routes');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 app.use(express.json());
